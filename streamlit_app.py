@@ -7,7 +7,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.densenet import preprocess_input
 
 MODEL_PATH = "densenet121_xray.h5"
-MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.0/densenet121_thorax_model.h5"
+MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.1/densenet121_xray.keras"
 
 if not os.path.exists(MODEL_PATH):
     with st.spinner("Sedang mengunduh model AI dari GitHub... Mohon tunggu sebentar."):
