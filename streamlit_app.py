@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import cv2
 import os
-import urllib.request
+import requests
 import tensorflow as tf
 
 MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.3/densenet121_xray_fixed.h5"
@@ -10,7 +10,11 @@ MODEL_PATH = "densenet121_xray_fixed.h5"
 
 if not os.path.exists(MODEL_PATH):
     with st.spinner("Sedang mengunduh model AI dari GitHub... Mohon tunggu sebentar."):
-        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+        response = requests.get(MODEL_URL, stream=True, allow_redirects=True)
+        response.raise_for_status()
+        with open(MODEL_PATH, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
 
 @st.cache_resource
 def load_my_model():
