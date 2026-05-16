@@ -5,9 +5,8 @@ import os
 import urllib.request
 import tensorflow as tf
 
-# Ganti URL ini setelah upload .h5 ke GitHub Release baru
-MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.2/densenet121_xray.h5"
-MODEL_PATH = "densenet121_xray.h5"
+MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.3/densenet121_xray_fixed.h5"
+MODEL_PATH = "densenet121_xray_fixed.h5"
 
 if not os.path.exists(MODEL_PATH):
     with st.spinner("Sedang mengunduh model AI dari GitHub... Mohon tunggu sebentar."):
