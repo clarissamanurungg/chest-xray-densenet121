@@ -1,7 +1,0 @@
-streamlit
-tensorflow
-numpy
-opencv-python-headless
-h5py
-pillow
-gdown
