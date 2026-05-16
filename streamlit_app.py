@@ -6,8 +6,14 @@ import urllib.request
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.densenet import preprocess_input
 
-MODEL_PATH = "densenet121_xray.h5"
+# ======================
+# MODEL DOWNLOAD
+# ======================
+
 MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.1/densenet121_xray.keras"
+
+# Nama file lokal disesuaikan dengan format asli yang didownload (.keras)
+MODEL_PATH = "densenet121_xray.keras"
 
 if not os.path.exists(MODEL_PATH):
     with st.spinner("Sedang mengunduh model AI dari GitHub... Mohon tunggu sebentar."):
@@ -80,24 +86,20 @@ if uploaded_file is not None:
     # PREPROCESSING
     # ======================
 
-    img = cv2.resize(img, (224,224))
+    img_resized = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
 
-    img = preprocess_input(img)
+    img_preprocessed = preprocess_input(img_resized.astype(np.float32))
 
-    img = np.expand_dims(img, axis=0)
+    img_input = np.expand_dims(img_preprocessed, axis=0)
 
     # ======================
     # PREDICTION
     # ======================
 
     with st.spinner("Analyzing X-Ray Image..."):
-
-        prediction = model.predict(img)[0]
+        prediction = model.predict(img_input)[0]
 
     st.subheader("Prediction Confidence")
 
     for i, prob in enumerate(prediction):
-
-        st.write(
-            f"{labels[i]} : {prob*100:.2f}%"
-        )
+        st.write(f"{labels[i]} : {prob*100:.2f}%")
