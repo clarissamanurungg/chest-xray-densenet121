@@ -30,15 +30,8 @@ def load_my_model():
     return tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 labels = [
-    "pneumonia",
-    "bronchitis",
-    "emphysema",
-    "edema",
-    "cardiomegaly",
-    "fibrosis",
-    "atelectasis",
-    "effusion",
-    "normal"
+    'pneumonia', 'bronchitis', 'emphysema', 'edema', 
+    'cardiomegaly', 'fibrosis', 'atelectasis', 'effusion'
 ]
 
 labels_display = {
