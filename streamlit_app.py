@@ -43,7 +43,6 @@ labels_display = {
     "fibrosis":     "Fibrosis",
     "atelectasis":  "Atelektasis",
     "effusion":     "Efusi Pleura",
-    "normal":       "Tidak Ada Kelainan (Normal)"
 }
 
 IMG_SIZE = 224
