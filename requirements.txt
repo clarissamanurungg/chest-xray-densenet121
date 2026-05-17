@@ -1,7 +1,4 @@
 streamlit
-tensorflow==2.21.0
 numpy
 opencv-python-headless
-h5py
-pillow
-requests
+tensorflow==2.15.0
