@@ -4,7 +4,7 @@ import cv2
 import tensorflow as tf
 
 MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.4/densenet121_thorax_model.h5"
-MODEL_PATH = "best_densenet121_model.h5"
+MODEL_PATH = "densenet121_thorax_model.h5"
 
 @st.cache_resource
 def load_my_model():
