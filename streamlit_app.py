@@ -1,18 +1,34 @@
 import streamlit as st
 import numpy as np
 import cv2
+import os
+import requests
 import tensorflow as tf
 
 MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.2/best_densenet121_model.h5"
 MODEL_PATH = "best_densenet121_model.h5"
 
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        with st.spinner("Mengunduh model, harap tunggu..."):
+            response = requests.get(MODEL_URL, stream=True)
+            total = int(response.headers.get('content-length', 0))
+            progress = st.progress(0, text="Mengunduh model...")
+            downloaded = 0
+            with open(MODEL_PATH, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    if total:
+                        pct = int(downloaded / total * 100)
+                        progress.progress(pct, text=f"Mengunduh model... {pct}%")
+            progress.empty()
+
 @st.cache_resource
 def load_my_model():
+    download_model()
     return tf.keras.models.load_model(MODEL_PATH, compile=False)
 
-model = load_my_model()
-
-# FIX BUG 1: Label disesuaikan dengan training (bukan label NIH CheXNet)
 labels = [
     "pneumonia",
     "bronchitis",
@@ -28,7 +44,7 @@ labels = [
 labels_display = {
     "pneumonia":    "Pneumonia",
     "bronchitis":   "Bronchitis",
-    "emphysema":    "Emfisema",
+    "emphysema":    "Emfisema Pulmonum",
     "edema":        "Edema Paru",
     "cardiomegaly": "Kardiomegali",
     "fibrosis":     "Fibrosis",
@@ -38,7 +54,7 @@ labels_display = {
 }
 
 IMG_SIZE = 224
-THRESHOLD = 0.5  # Threshold untuk multi-label classification
+THRESHOLD = 0.5
 
 st.set_page_config(
     page_title="Chest X-Ray Disease Classification",
@@ -48,8 +64,9 @@ st.set_page_config(
 
 st.title("Chest X-Ray Disease Classification")
 st.write("Optimasi Akurasi Klasifikasi Multi-label Penyakit Paru Menggunakan DenseNet-121")
-
 st.divider()
+
+model = load_my_model()
 
 uploaded_file = st.file_uploader(
     "Upload Chest X-Ray",
@@ -62,12 +79,13 @@ if uploaded_file is not None:
     img_bgr = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
     if img_bgr is None:
-        st.error("Gagal membaca gambar. Pastikan file tidak rusak dan formatnya JPG/PNG.")
+        st.error("Gagal membaca gambar. Pastikan file tidak rusak.")
         st.stop()
 
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     st.image(img_rgb, caption="Uploaded X-Ray", use_container_width=True)
 
+    # Preprocessing sesuai training (img / 255.0)
     img_resized = cv2.resize(img_bgr, (IMG_SIZE, IMG_SIZE)).astype(np.float32)
     img_preprocessed = img_resized / 255.0
     img_input = np.expand_dims(img_preprocessed, axis=0)
@@ -100,9 +118,7 @@ if uploaded_file is not None:
     st.divider()
     st.subheader("Confidence Score Semua Kelas")
 
-    sorted_preds = sorted(
-        enumerate(prediction), key=lambda x: x[1], reverse=True
-    )
+    sorted_preds = sorted(enumerate(prediction), key=lambda x: x[1], reverse=True)
     for idx, prob in sorted_preds:
         label = labels[idx]
         display_name = labels_display.get(label, label)
