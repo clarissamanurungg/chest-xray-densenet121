@@ -84,9 +84,10 @@ if uploaded_file is not None:
     img_preprocessed = img_resized / 255.0
     img_input = np.expand_dims(img_preprocessed, axis=0)
 
-    with st.spinner("Menganalisis gambar X-Ray..."):
-        prediction = model.predict(img_input)[0]
-
+    with st.spinner("Analyzing X-Ray Image..."):
+        raw_prediction = model.predict(img_input)[0]
+        prediction = 1 / (1 + np.exp(-raw_prediction))
+    
     st.subheader("Hasil Prediksi")
 
     detected = [(labels[i], prediction[i]) for i in range(len(labels)) if prediction[i] >= THRESHOLD]
