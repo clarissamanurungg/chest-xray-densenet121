@@ -7,7 +7,7 @@ import os
 import requests
 import tensorflow as tf
 
-MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.2/best_densenet121_model.h5"
+MODEL_URL = "MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/releases/download/1.5/best_densenet121_model.h5""
 MODEL_PATH = "best_densenet121_model.h5"
 
 def download_model():
