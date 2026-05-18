@@ -1,5 +1,3 @@
-# force update railway
-
 import streamlit as st
 import numpy as np
 import cv2
@@ -11,20 +9,21 @@ MODEL_URL = "https://github.com/clarissamanurungg/chest-xray-densenet121/release
 MODEL_PATH = "best_densenet121_model.h5"
 
 def download_model():
-    if not os.path.exists(MODEL_PATH):
-        with st.spinner("Mengunduh model, harap tunggu..."):
-            response = requests.get(MODEL_URL, stream=True)
-            total = int(response.headers.get('content-length', 0))
-            progress = st.progress(0, text="Mengunduh model...")
-            downloaded = 0
-            with open(MODEL_PATH, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
-                    downloaded += len(chunk)
-                    if total:
-                        pct = int(downloaded / total * 100)
-                        progress.progress(pct, text=f"Mengunduh model... {pct}%")
-            progress.empty()
+    if os.path.exists(MODEL_PATH):
+        os.remove(MODEL_PATH)
+    with st.spinner("Mengunduh model, harap tunggu..."):
+        response = requests.get(MODEL_URL, stream=True)
+        total = int(response.headers.get('content-length', 0))
+        progress = st.progress(0, text="Mengunduh model...")
+        downloaded = 0
+        with open(MODEL_PATH, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+                downloaded += len(chunk)
+                if total:
+                    pct = int(downloaded / total * 100)
+                    progress.progress(pct, text=f"Mengunduh model... {pct}%")
+        progress.empty()
 
 @st.cache_resource
 def load_my_model():
@@ -32,8 +31,8 @@ def load_my_model():
     return tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 labels = [
-    'pneumonia', 'bronchitis', 'emphysema', 'edema', 
-    'cardiomegaly', 'fibrosis', 'atelectasis', 'effusion'
+    'pneumonia', 'bronchitis', 'emphysema', 'edema',
+    'cardiomegaly', 'fibrosis', 'atelectasis', 'effusion', 'normal'
 ]
 
 labels_display = {
@@ -45,6 +44,7 @@ labels_display = {
     "fibrosis":     "Fibrosis",
     "atelectasis":  "Atelektasis",
     "effusion":     "Efusi Pleura",
+    "normal":       "Tidak Ada Kelainan (Normal)"
 }
 
 IMG_SIZE = 224
@@ -79,15 +79,12 @@ if uploaded_file is not None:
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     st.image(img_rgb, caption="Uploaded X-Ray", use_container_width=True)
 
-    # Preprocessing sesuai training (img / 255.0)
     img_resized = cv2.resize(img_bgr, (IMG_SIZE, IMG_SIZE)).astype(np.float32)
-    img_preprocessed = img_resized 
-    img_input = np.expand_dims(img_preprocessed, axis=0)
+    img_input = np.expand_dims(img_resized, axis=0)
 
-    with st.spinner("Analyzing X-Ray Image..."):
-        raw_prediction = model.predict(img_input)[0]
-        prediction = 1 / (1 + np.exp(-raw_prediction))
-    
+    with st.spinner("Menganalisis gambar X-Ray..."):
+        prediction = model.predict(img_input)[0]
+
     st.subheader("Hasil Prediksi")
 
     detected = [(labels[i], prediction[i]) for i in range(len(labels)) if prediction[i] >= THRESHOLD]
