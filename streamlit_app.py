@@ -81,7 +81,7 @@ if uploaded_file is not None:
 
     # Preprocessing sesuai training (img / 255.0)
     img_resized = cv2.resize(img_bgr, (IMG_SIZE, IMG_SIZE)).astype(np.float32)
-    img_preprocessed = img_resized / 255.0
+    img_preprocessed = img_resized 
     img_input = np.expand_dims(img_preprocessed, axis=0)
 
     with st.spinner("Analyzing X-Ray Image..."):
